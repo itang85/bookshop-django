@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=9(_7o46cu@n%@#siattljfy_9lw2j-l4kt3(i!%biw_tqkoc9'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -93,6 +93,7 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 
+# Mysql 数据库配置
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -181,7 +182,7 @@ LOGGING = {
         'file_handler': {
             'level': 'DEBUG',
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'logs/booksforyou.log',
+            'filename': 'logs/project.log',  # 自定义日志文件名
             'when': 'D',
             'interval': 1,
             'formatter': 'simple',
