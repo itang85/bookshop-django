@@ -408,6 +408,7 @@ class BaseModel(models.Model):
     # sort_time = models.DateTimeField(auto_now_add=True, verbose_name='排序时间')
     create_time = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, db_index=True, verbose_name='更新时间')
+    deleted = models.BooleanField(default=False, verbose_name='是否删除')
 
     # objects = BigDataFilterManager()  # 是否开放大数据时的日期过滤
 
