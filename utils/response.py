@@ -14,8 +14,7 @@ def json_response(errno=None, errmsg=None, result=None, status=200, **kwargs):
 
     resp = Response(data=data, status=status)
 
-    token = kwargs.get('token')
-    if token:
-        resp.set_cookie('Token', token)
+    if type(result) == dict and result.get('token'):
+        resp.set_cookie('Token', result.get('token'))
 
     return resp

@@ -13,7 +13,7 @@ class GroupModel(SoftDeleteObject, BaseModel):
     group_desc = models.CharField(max_length=255, verbose_name='用户组描述')
 
     class Meta:
-        db_table = 'user_group_table'
+        db_table = 'users_group_table'
         verbose_name = '用户组表'
         verbose_name_plural = verbose_name
 
@@ -21,10 +21,10 @@ class GroupModel(SoftDeleteObject, BaseModel):
 class AuthModel(SoftDeleteObject, BaseModel):
     auth_type = models.CharField(max_length=128, verbose_name='权限组名称')
     auth_desc = models.CharField(max_length=255, verbose_name='权限组描述')
-    routers = models.TextField(verbose_name='前端路由')
+    routers = models.TextField(blank=True, null=True, verbose_name='前端路由')
 
     class Meta:
-        db_table = 'user_auth_table'
+        db_table = 'users_auth_table'
         verbose_name = '权限组表'
         verbose_name_plural = verbose_name
 
@@ -39,7 +39,7 @@ class AuthPermissionModel(SoftDeleteObject, BaseModel):
     auth_destroy = models.BooleanField(default=False, verbose_name='删除')
 
     class Meta:
-        db_table = 'user_permission_table'
+        db_table = 'users_permission_table'
         verbose_name = '权限菜单表'
         verbose_name_plural = verbose_name
 
@@ -67,6 +67,6 @@ class UserModel(SoftDeleteObject, BaseModel):
     last_login = models.DateTimeField(null=True, blank=True, verbose_name='上次登录时间')
 
     class Meta:
-        db_table = 'user_info_table'
+        db_table = 'users_info_table'
         verbose_name = '用户表'
         verbose_name_plural = verbose_name

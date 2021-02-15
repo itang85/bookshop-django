@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'apps.base',
-    'apps.users'
+    'apps.users',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -219,4 +220,32 @@ LOGGING = {
             'propagate': False,
         }
     }
+}
+
+
+# rest 相关配置
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    # ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer'
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ),
+    # 格式化时间
+    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
+    # 'DATETIME_INPUT_FORMATS': ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M'),
+    'DATE_FORMAT': '%Y-%m-%d',
+    'DATE_INPUT_FORMATS': ('%Y-%m-%d',),
+    'TIME_FORMAT': '%H:%M:%S',
+    'TIME_INPUT_FORMATS': ('%H:%M:%S',),
 }
