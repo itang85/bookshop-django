@@ -2,7 +2,7 @@ from django.db import models
 from apps.base.models import BaseModel, SoftDeleteObject
 
 
-class Group(SoftDeleteObject, BaseModel):
+class GroupModel(SoftDeleteObject, BaseModel):
     group_type_choices = (
         ('SuperAdmin', '超级管理员'),
         ('Admin', '管理员'),
@@ -18,9 +18,10 @@ class Group(SoftDeleteObject, BaseModel):
         verbose_name_plural = verbose_name
 
 
-class Auth(SoftDeleteObject, BaseModel):
+class AuthModel(SoftDeleteObject, BaseModel):
     auth_type = models.CharField(max_length=128, verbose_name='权限组名称')
     auth_desc = models.CharField(max_length=255, verbose_name='权限组描述')
+    routers = models.TextField(verbose_name='前端路由')
 
     class Meta:
         db_table = 'user_auth_table'
@@ -28,10 +29,10 @@ class Auth(SoftDeleteObject, BaseModel):
         verbose_name_plural = verbose_name
 
 
-class AuthPermission(SoftDeleteObject, BaseModel):
+class AuthPermissionModel(SoftDeleteObject, BaseModel):
     object_name = models.CharField( max_length=128, verbose_name='功能名称')
     object_name_cn = models.CharField(max_length=128, verbose_name='功能名称_cn')
-    auth = models.ForeignKey(Auth, on_delete=models.CASCADE, verbose_name='权限组', related_name='auth_permissions')
+    auth = models.ForeignKey(AuthModel, on_delete=models.CASCADE, verbose_name='权限组', related_name='auth_permissions')
     auth_list = models.BooleanField(default=False, verbose_name='查看')
     auth_create = models.BooleanField(default=False, verbose_name='新增')
     auth_update = models.BooleanField(default=False, verbose_name='修改')
@@ -43,7 +44,7 @@ class AuthPermission(SoftDeleteObject, BaseModel):
         verbose_name_plural = verbose_name
 
 
-class User(SoftDeleteObject, BaseModel):
+class UserModel(SoftDeleteObject, BaseModel):
     # 管理员时使用账户密码登录
     username = models.CharField(max_length=32, default='', blank=True, verbose_name='用户账号')
     password = models.CharField(max_length=255, default='',blank=True, verbose_name='用户密码')
@@ -60,9 +61,9 @@ class User(SoftDeleteObject, BaseModel):
     birth_date = models.DateField(verbose_name='生日', null=True, blank=True)
     is_freeze = models.IntegerField(default=0, choices=((0, '否'),(1, '是')),  verbose_name='是否冻结/是否封号')
     # is_admin = models.BooleanField(default=False, verbose_name='是否管理员')
-    group = models.ForeignKey(Group, on_delete=models.PROTECT, verbose_name='用户组')
+    group = models.ForeignKey(GroupModel, on_delete=models.PROTECT, verbose_name='用户组')
     # 组权分离后 当有权限时必定为管理员类型用户，否则为普通用户
-    auth = models.ForeignKey(Auth, on_delete=models.PROTECT, null=True, blank=True, verbose_name='权限组') # 当auth被删除时，当前user的auth会被保留，但是auth下的auth_permissions会被删除，不返回
+    auth = models.ForeignKey(AuthModel, on_delete=models.PROTECT, null=True, blank=True, verbose_name='权限组') # 当auth被删除时，当前user的auth会被保留，但是auth下的auth_permissions会被删除，不返回
     last_login = models.DateTimeField(null=True, blank=True, verbose_name='上次登录时间')
 
     class Meta:
