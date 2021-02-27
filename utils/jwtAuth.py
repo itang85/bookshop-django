@@ -45,7 +45,7 @@ class JWTAuthentication(BaseAuthentication):
         return user
 
     # def get_jwt_value(self, request):
-    #     auth = request.META.get('HTTP_AUTHORIZATION', '').split()
+    #     auth = request.META.get('AUTHORIZATION', '').split()
     #     auth_header_prefix = api_settings.JWT_AUTH_HEADER_PREFIX.lower()
     #
     #     if not auth or auth[0].lower() != auth_header_prefix:
@@ -61,7 +61,9 @@ class JWTAuthentication(BaseAuthentication):
     #     return auth[1]
 
     def get_jwt_value(self, request):
-        token = request.COOKIES['Token']
+        token = request.COOKIES.get('Token')
+        if not token:
+            raise exceptions.AuthenticationFailed({'errno': 1003, 'errmsg': '登录失效，请重新登录！'})
         return token
 
     def authenticate_header(self, request):
