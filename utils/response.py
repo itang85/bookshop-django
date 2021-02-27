@@ -1,7 +1,7 @@
-from rest_framework.response import Response
+from django.http.response import JsonResponse
 
 
-def json_response(errno=None, errmsg=None, result=None, status=200, **kwargs):
+def json_response(result=None, errno=None, errmsg=None, status=200, **kwargs):
     data = {
         'errno': errno or 0,
         'errmsg': errmsg or 'SUCCESS',
@@ -12,7 +12,7 @@ def json_response(errno=None, errmsg=None, result=None, status=200, **kwargs):
 
     data['data'].update(kwargs)
 
-    resp = Response(data=data, status=status)
+    resp = JsonResponse(data=data, status=status)
 
     if type(result) == dict and result.get('token'):
         resp.set_cookie('Token', result.get('token'))

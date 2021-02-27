@@ -17,6 +17,9 @@ from django.db.models import query
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
+
+from storage.astorage import GoodFileStorage
+
 try:
     from django.contrib.contenttypes.fields import GenericForeignKey
 except ImportError:
@@ -292,6 +295,7 @@ class ChangeSet(models.Model):
         index_together = [
             ("content_type", "object_id"),
         ]
+        managed=False
 
     def get_content(self):
         self.record = self.content_type.model_class().objects.get(
@@ -330,6 +334,7 @@ class SoftDeleteRecord(models.Model):
         index_together = [
             ("content_type", "object_id"),
         ]
+        managed=False
 
     def get_content(self):
         self.record = self.content_type.model_class().objects.get(pk=self.object_id)
@@ -414,3 +419,11 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class FileModel(SoftDeleteObject, BaseModel):
+    file = models.FileField(upload_to='file', storage=GoodFileStorage(), verbose_name='文件')
+
+    @property
+    def file_path(self):
+        return 'http://192.168.31.130:8000' + self.file.url

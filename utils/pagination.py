@@ -15,7 +15,7 @@ class Pagination(PageNumberPagination):
         # print(8888, settings.SERVER_NAME)
         # print(8888, self.get_next_link().split(self.request.path))
         return settings.SERVER_NAME + self.request.path + self.get_next_link().split(self.request.path)[1]
-    
+
     def get_my_pre(self):
         return settings.SERVER_NAME + self.request.path + self.get_previous_link().split(self.request.path)[1]
 
@@ -26,3 +26,9 @@ class Pagination(PageNumberPagination):
             'previous': self.get_previous_link(),
             'data': data
         })
+
+    @staticmethod
+    def pagination_filter(data, page, page_size):
+        if type(data) != list or type(page) != int or type(page_size) != int:
+            return []
+        return data[(page-1)*page_size:page*page_size]

@@ -5,3 +5,6 @@ __pycache__
 logs/
 media/
 static/
+
+apps/base/migrations
+apps/users/migrations

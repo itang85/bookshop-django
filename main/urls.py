@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.urls import path, include
 from django.conf import settings
+from django.views.static import serve
 from rest_framework.routers import DefaultRouter
 from rest_framework import permissions
 
@@ -25,6 +26,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 from apps.users.views import LoginView, UserViewSet
+from apps.base.views import FileSystemView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -42,17 +44,19 @@ schema_view = get_schema_view(
 # 使用 viewset 路由管理
 router = DefaultRouter()
 # 账号管理
-router.register(r'user', UserViewSet, basename='账号管理')
+router.register(r'users', UserViewSet, basename='账号管理')
 
 urlpatterns = [
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('', include(router.urls)),
+    url(r'^media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}),
+    path('api/v1/', include(router.urls)),
     path('admin/', admin.site.urls),
-    path('login/', LoginView.as_view(), name='Login'),
+    path('api/v1/file/', FileSystemView.as_view(), name='文件上传'),
+    path('api/v1/user/', include('apps.users.urls')),
+    path('api/v1/mall/', include('apps.mall.urls')),
 
-    path('users/', include('apps.users.urls')),
 ]
 
 if settings.DEBUG:

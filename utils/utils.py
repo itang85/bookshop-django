@@ -7,7 +7,9 @@ from calendar import timegm
 # 导入使用缓存的模块
 # from django.core.cache import cache
 from rest_framework.throttling import BaseThrottle
+from django.conf import settings
 
+from conf.area.area_list import area_dict
 from utils.settings import api_settings
 
 
@@ -90,3 +92,10 @@ class VisitThrottle(BaseThrottle):
     def wait(self):
         ctime = time.time()
         return 60 - (ctime-self.history[-1])
+
+
+def get_region_cn(code):
+    province = area_dict['province_list'][code[0:2] + '0000']
+    city = area_dict['city_list'][code[0:4] + '00']
+    county = area_dict['county_list'][code]
+    return province + '-' + city + '-' + county

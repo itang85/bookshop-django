@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'apps.base',
     'apps.users',
+    'apps.mall',
     'drf_yasg'
 ]
 
@@ -68,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middleware.guard.CustomerMiddleware'
 ]
 
 ROOT_URLCONF = 'main.urls'
@@ -158,69 +160,69 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 ADMINS = [('BOSS', 'itang85@163.com')]
 
-LOGGING = {
-    'version': 1,
-    'disable_exiting_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {process:d} {thread:d} {pathname} {module} {lineno} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'filters': {
-        # 'special': {
-        #     '()': 'project.logging.SpecialFilter',
-        #     'foo': 'bar',
-        # },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
-    'handlers': {
-        'file_handler': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'logs/project.log',  # 自定义日志文件名
-            'when': 'D',
-            'interval': 1,
-            'formatter': 'simple',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-            'filters': ['require_debug_true']
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file_handler', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['file_handler', 'mail_admins'],
-            'filters': ['require_debug_true'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        'custom': {
-            'handlers': ['file_handler', 'console'],
-            'level': 'DEBUG',
-            # 'filters': ['special'],
-            'propagate': False,
-        }
-    }
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_exiting_loggers': False,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {process:d} {thread:d} {pathname} {module} {lineno} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'filters': {
+#         # 'special': {
+#         #     '()': 'project.logging.SpecialFilter',
+#         #     'foo': 'bar',
+#         # },
+#         'require_debug_true': {
+#             '()': 'django.utils.log.RequireDebugTrue',
+#         },
+#     },
+#     'handlers': {
+#         'file_handler': {
+#             'level': 'DEBUG',
+#             'class': 'logging.handlers.TimedRotatingFileHandler',
+#             'filename': 'logs/project.log',  # 自定义日志文件名
+#             'when': 'D',
+#             'interval': 1,
+#             'formatter': 'simple',
+#         },
+#         'console': {
+#             'level': 'DEBUG',
+#             'filters': ['require_debug_true'],
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple'
+#         },
+#         'mail_admins': {
+#             'level': 'ERROR',
+#             'class': 'django.utils.log.AdminEmailHandler',
+#             'filters': ['require_debug_true']
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file_handler', 'console'],
+#             'level': 'INFO',
+#             'propagate': False,
+#         },
+#         'django.request': {
+#             'handlers': ['file_handler', 'mail_admins'],
+#             'filters': ['require_debug_true'],
+#             'level': 'ERROR',
+#             'propagate': False,
+#         },
+#         'custom': {
+#             'handlers': ['file_handler', 'console'],
+#             'level': 'DEBUG',
+#             # 'filters': ['special'],
+#             'propagate': False,
+#         }
+#     }
+# }
 
 
 # rest 相关配置
