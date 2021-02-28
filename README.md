@@ -9,6 +9,16 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple django django-cors-heade
 models.UserModel.objects.create(sort=1, username="root", password="140039", mobile="18280433213", group_id=1, auth_id=1)
 id:  1-普通用户， 2-管理员， 3-超级管理员
 
+数据导入导出
+
+```powershell
+python manage.py dumpdata > db_data/data_20210228.json
+
+python manage.py loaddata db_data/data_20210228.json
+```
+
+
+
 序列化器命名规范
 ``` python
 serializer_string = 'apps.' + request.resolver_match.app_name + '.serializers.' + func.__name__ + self.__class__.__name__ + 'Serializer'

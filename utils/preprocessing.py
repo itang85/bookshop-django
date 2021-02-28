@@ -38,7 +38,7 @@ def protect(errno=None):
         def wrapper(*args, **kwargs):
             try:
                 res = func(*args, **kwargs)
-                return res
+                return json_response(result=res)
             except CustomerError as e:
                 return json_response(errno=e.errno, errmsg=e.errmsg, **e.kwargs)
             except Exception as e:

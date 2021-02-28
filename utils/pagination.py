@@ -29,6 +29,6 @@ class Pagination(PageNumberPagination):
 
     @staticmethod
     def pagination_filter(data, page, page_size):
-        if type(data) != list or type(page) != int or type(page_size) != int:
+        if type(page) != int or type(page_size) != int:
             return []
         return data[(page-1)*page_size:page*page_size]
