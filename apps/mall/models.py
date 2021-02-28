@@ -147,3 +147,24 @@ class CartModel(SoftDeleteObject, BaseModel):
         db_table = 'cart_table'
         verbose_name = '购物车信息表'
         verbose_name_plural = verbose_name
+
+
+class RateModel(SoftDeleteObject, BaseModel):
+    fraction = models.IntegerField(verbose_name='数量')
+    product = models.ForeignKey(
+        ProductModel,
+        on_delete=models.DO_NOTHING,
+        verbose_name='对应商品',
+        related_name='product_rate'
+    )
+    user = models.ForeignKey(
+        UserModel,
+        on_delete=models.DO_NOTHING,
+        verbose_name='评分人',
+        related_name='user_rate'
+    )
+
+    class Meta:
+        db_table = 'rate_table'
+        verbose_name = '商品评分表'
+        verbose_name_plural = verbose_name

@@ -61,29 +61,55 @@ class putUserViewSerializer(serializers.Serializer):
 
 
 class getShippingAddressViewSerializer(serializers.Serializer):
+    id = serializers.IntegerField(allow_null=True, required=False)
+    _data = serializers.JSONField(required=False)
     def validate(self, attrs):
         now_user = self.context['request'].user
-        obj_address = ShippingAddressModel.objects.filter(receiver_id=now_user.id).values()
-        attrs = list(obj_address)
+        if not attrs.get('id'):
+            attrs['_data'] = list(ShippingAddressModel.objects.filter(receiver_id=now_user.id).values())
+        else:
+            attrs['_data'] = list(ShippingAddressModel.objects.filter(id=attrs.get('id')).values())
         return attrs
 
+
 class postShippingAddressViewSerializer(serializers.Serializer):
-    real_name = serializers.CharField()
-    mobile = serializers.CharField()
-    region = serializers.CharField()
-    address = serializers.CharField()
+    addressDetail = serializers.CharField()
+    areaCode = serializers.CharField()
+    city = serializers.CharField()
+    country = serializers.CharField(allow_blank=True, required=False)
+    county = serializers.CharField()
+    isDefault = serializers.BooleanField()
+    name = serializers.CharField()
+    postalCode = serializers.CharField()
+    province = serializers.CharField()
+    tel = serializers.CharField()
+    _data = serializers.JSONField(required=False)
 
     def validate(self, attrs):
         now_user = self.context['request'].user
-        attrs['receiver'] = UserModel.objects.filter(id=now_user.id).first()
+        attrs['_data'] = {}
+        attrs['_data']['receiver'] = UserModel.objects.filter(id=now_user.id).first()
         return attrs
 
 class putShippingAddressViewSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    real_name = serializers.CharField(required=False)
-    mobile = serializers.CharField(required=False)
-    region = serializers.CharField(required=False)
-    address = serializers.CharField(required=False)
+    addressDetail = serializers.CharField()
+    areaCode = serializers.CharField()
+    city = serializers.CharField()
+    country = serializers.CharField(allow_blank=True, required=False)
+    county = serializers.CharField()
+    isDefault = serializers.BooleanField()
+    name = serializers.CharField()
+    postalCode = serializers.CharField()
+    province = serializers.CharField()
+    tel = serializers.CharField()
+    _data = serializers.JSONField(required=False)
+
+    def validate(self, attrs):
+        now_user = self.context['request'].user
+        attrs['_data'] = {}
+        attrs['_data']['receiver'] = UserModel.objects.filter(id=now_user.id).first()
+        return attrs
 
 class deleteShippingAddressViewSerializer(serializers.Serializer):
     id = serializers.IntegerField()

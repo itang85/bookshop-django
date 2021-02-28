@@ -6,14 +6,11 @@ from apps.mall.models import *
 
 
 class getProductViewSerializer(serializers.Serializer):
-    tag = serializers.CharField()
-    key = serializers.CharField(required=False)
-    page = serializers.IntegerField(required=False)
-    page_size = serializers.IntegerField(required=False)
-
+    _data = serializers.JSONField(required=False)
     def validate(self, attrs):
         now_user = self.context['request'].user
-        attrs['user'] = now_user
+        attrs['_data'] = {}
+        attrs['_data']['user'] = now_user
         return attrs
 
 
@@ -39,10 +36,12 @@ class postProductViewSerializer(serializers.Serializer):
 
 
 class getCartViewSerializer(serializers.Serializer):
+    _data = serializers.JSONField(required=False)
 
     def validate(self, attrs):
         now_user = self.context['request'].user
-        attrs['user'] = now_user
+        attrs['_data'] = {}
+        attrs['_data']['user'] = now_user
         return attrs
 
 
@@ -50,10 +49,12 @@ class postCartViewSerializer(serializers.Serializer):
     count = serializers.IntegerField()
     selling_product_id = serializers.IntegerField()
     seller_id = serializers.IntegerField()
+    _data = serializers.JSONField(required=False)
 
     def validate(self, attrs):
         now_user = self.context['request'].user
-        attrs['user'] = now_user
+        attrs['_data'] = {}
+        attrs['_data']['user'] = now_user
         return attrs
 
 

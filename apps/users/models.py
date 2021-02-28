@@ -85,10 +85,16 @@ class UserModel(SoftDeleteObject, BaseModel):
 
 
 class ShippingAddressModel(SoftDeleteObject, BaseModel):
-    real_name = models.CharField(max_length=16, default='', blank=True, verbose_name='真实姓名')
-    mobile = models.CharField(max_length=11, default='', blank=True, verbose_name='用户手机号')
-    region = models.CharField(max_length=255, default='', blank=True, verbose_name='地区')
-    address = models.CharField(max_length=255, default='', blank=True, verbose_name='详细地址')
+    name = models.CharField(max_length=16, default='', blank=True, verbose_name='真实姓名')
+    tel = models.CharField(max_length=11, default='', blank=True, verbose_name='用户手机号')
+    areaCode = models.CharField(max_length=20, default='', blank=True, verbose_name='地区码')
+    country = models.CharField(max_length=255, default='', blank=True, verbose_name='国家')
+    province = models.CharField(max_length=255, default='', blank=True, verbose_name='省/直辖市')
+    city = models.CharField(max_length=255, default='', blank=True, verbose_name='市')
+    county = models.CharField(max_length=255, default='', blank=True, verbose_name='区')
+    addressDetail = models.CharField(max_length=255, default='', blank=True, verbose_name='详细地址')
+    isDefault = models.BooleanField(default=False, blank=True, null=True, verbose_name='默认')
+    postalCode = models.CharField(max_length=20, default='', blank=True, verbose_name='邮编')
     receiver = models.ForeignKey(
         UserModel,
         on_delete=models.DO_NOTHING,

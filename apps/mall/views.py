@@ -26,11 +26,21 @@ class ProductView(generics.GenericAPIView):
 
     authentication_classes = (JWTAuthentication,)
 
-    @warm_hug()
+    @protect()
     def get(self, request, *args, **kwargs):
-        request_data = kwargs.get('data')
-        get_data = import_string('get_' + request_data.get('tag') + '_data')
-        data = get_data(request_data)
+        activeName = request.GET.get('activeName')
+        key = request.GET.get('key')
+        page = int(request.GET.get('page'))
+        page_size = int(request.GET.get('page_size'))
+
+        if activeName == 'recommend':
+            data = self.get_recommend_data(key, page, page_size)
+        elif activeName == 'new':
+            data = self.get_new_data(key, page, page_size)
+        elif activeName == 'selling':
+            data = self.get_selling_data(key, page, page_size)
+        else:
+            data = []
         return data
 
     @warm_hug()
@@ -58,45 +68,79 @@ class ProductView(generics.GenericAPIView):
         )
 
     @staticmethod
-    def get_recommend_data(params):
-        key = params.get('key')
-        page = params.get('page')
-        page_size = params.get('page_size')
+    def get_recommend_data(key, page, page_size):
         qset_product = ProductModel.objects.filter(
             Q(name__icontains=key) |
             Q(introduction__icontains=key) |
             Q(publisher__icontains=key)
         )
-        product_list = list(qset_product)
-        for i in len(product_list):
-            product_list[i]['category_list'] = [c.category_list for c in qset_product[i].category.all()]
-            product_list[i]['price'] = str(product_list[i]['price'])
-        res = Pagination.pagination_filter(product_list, page, page_size)
+        res = []
+        products = Pagination.pagination_filter(qset_product, page, page_size)
+        for p in products:
+            res.append({
+                'id': p.id,
+                'name': p.name,
+                'introduction': p.introduction,
+                'detail': p.detail,
+                'cover': p.cover,
+                'price': str(p.price),
+                'publisher': p.publisher,
+                'category': [c.category_list for c in p.category.all()],
+            })
+
         return res
 
     @staticmethod
-    def get_new_data(params):
-        key = params.get('key')
-        page = params.get('page')
-        page_size = params.get('page_size')
+    def get_new_data(key, page, page_size):
         now_time = datetime.datetime.now()
-        month_ago = datetime.timedelta(days=30)
+        month_ago = now_time - datetime.timedelta(days=30)
         qset_product = ProductModel.objects.order_by('-create_time').filter(
-            Q(name__icontains=key) |
-            Q(introduction__icontains=key) |
-            Q(publisher__icontains=key),
-            create_time__range=(now_time, month_ago)
+            # Q(name__icontains=key) |
+            # Q(introduction__icontains=key) |
+            # Q(publisher__icontains=key),
+            create_time__range=(month_ago, now_time)
         )
-        product_list = list(qset_product)
-        for i in len(product_list):
-            product_list[i]['category_list'] = [c.category_list for c in qset_product[i].category.all()]
-            product_list['price'] = str(product_list['price'])
-        res = Pagination.pagination_filter(product_list, page, page_size)
+        res = []
+        products = Pagination.pagination_filter(qset_product, page, page_size)
+        for p in products:
+            res.append({
+                'id': p.id,
+                'name': p.name,
+                'introduction': p.introduction,
+                'detail': p.detail,
+                'cover': p.cover,
+                'price': str(p.price),
+                'publisher': p.publisher,
+                'category': [c.category_list for c in p.category.all()],
+            })
+
         return res
 
     @staticmethod
-    def get_price_data(params):
-        pass
+    def get_selling_data(key, page, page_size):
+        return []
+
+
+class GoodsView(generics.GenericAPIView):
+
+    @protect()
+    def get(self, request, *args, **kwargs):
+        pid = request.GET.get('pid')
+        obj_product = ProductModel.objects.filter(id=pid).first()
+        obj_img = ProductImageModel.objects.filter(selling_product__product_id=pid).values('id', 'image')
+        res = [{
+                'id': obj_product.id,
+                'name': obj_product.name,
+                'introduction': obj_product.introduction,
+                'detail': obj_product.detail,
+                'cover': obj_product.cover,
+                'price': str(obj_product.price),
+                'publisher': obj_product.publisher,
+                'category_list': [c.category_list for c in obj_product.category.all()],
+                'image_list': list(obj_img)
+            }]
+        print(res)
+        return res
 
 
 class CartView(generics.GenericAPIView):
@@ -106,7 +150,7 @@ class CartView(generics.GenericAPIView):
     @warm_hug()
     def get(self, request, *args, **kwargs):
         request_data = kwargs.get('data')
-        user = kwargs.get('user')
+        user = request_data['_data']['user']
         obj_cart = CartModel.objects.select_related('selling_product__product').filter(buyer_id=user.id)
         res = [{
             'id': o.id,
@@ -117,14 +161,14 @@ class CartView(generics.GenericAPIView):
             'cover': o.selling_product.product.cover,
             'price': str(o.selling_product.product.price),
             'publisher': o.selling_product.product.publisher,
-            'category_list': o.selling_product.product.category.category_list
+            'category_list': [c.category_list for c in o.selling_product.product.category.all()]
         } for o in obj_cart]
         return res
 
     @warm_hug()
     def post(self, request, *args, **kwargs):
         request_data = kwargs.get('data')
-        user = kwargs.get('user')
+        user = request_data['_data']['user']
         selling_product_id = request_data.get('selling_product_id')
         seller_id = request_data.get('seller_id')
         CartModel.objects.create(

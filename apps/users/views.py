@@ -95,21 +95,45 @@ class ShippingAddressView(generics.GenericAPIView):
 
     @warm_hug()
     def get(self, request, *args, **kwargs):
-        data = kwargs.get('data')
+        data = kwargs['data']['_data']
         return data
 
     @warm_hug()
     def post(self, request, *args, **kwargs):
         request_data = kwargs.get('data')
-        ShippingAddressModel.objects.create(**request_data)
+        receiver = request_data['_data']['receiver']
+        ShippingAddressModel.objects.create(
+            addressDetail=request_data.get('addressDetail'),
+            areaCode=request_data.get('areaCode'),
+            city=request_data.get('city'),
+            country=request_data.get('country'),
+            county=request_data.get('county'),
+            isDefault=request_data.get('isDefault'),
+            name=request_data.get('name'),
+            postalCode=request_data.get('postalCode'),
+            province=request_data.get('province'),
+            tel=request_data.get('tel'),
+            receiver=receiver,
+        )
 
     @warm_hug()
     def put(self, request, *args, **kwargs):
         request_data = kwargs.get('data')
-        obj = ShippingAddressModel.objects.get(id=request_data.pop('id'))
-        for key in request_data:
-            if request_data[key]: setattr(obj, key, request_data[key])
-        obj.save()
+        receiver = request_data['_data']['receiver']
+        if request_data.get('isDefault'): ShippingAddressModel.objects.filter(receiver_id=receiver.id, isDefault=True).update(isDefault=False)
+        ShippingAddressModel.objects.filter(id=request_data['id']).update(
+            addressDetail=request_data.get('addressDetail'),
+            areaCode=request_data.get('areaCode'),
+            city=request_data.get('city'),
+            country=request_data.get('country'),
+            county=request_data.get('county'),
+            isDefault=request_data.get('isDefault'),
+            name=request_data.get('name'),
+            postalCode=request_data.get('postalCode'),
+            province=request_data.get('province'),
+            tel=request_data.get('tel'),
+            receiver=receiver,
+        )
         return
 
     @warm_hug()
