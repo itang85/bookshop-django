@@ -3,7 +3,6 @@ import uuid
 from django.db import models
 from apps.base.models import BaseModel, SoftDeleteObject
 from apps.users.models import UserModel, ShippingAddressModel
-from storage.astorage import GoodFileStorage
 
 
 class CategoryModel(SoftDeleteObject, BaseModel):

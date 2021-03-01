@@ -17,7 +17,7 @@ class GroupModel(SoftDeleteObject, BaseModel):
         db_table = 'users_group_table'
         verbose_name = '用户组表'
         verbose_name_plural = verbose_name
-        managed = False
+        # managed = False
 
 
 class AuthModel(SoftDeleteObject, BaseModel):
@@ -29,7 +29,7 @@ class AuthModel(SoftDeleteObject, BaseModel):
         db_table = 'users_auth_table'
         verbose_name = '权限组表'
         verbose_name_plural = verbose_name
-        managed = False
+        # managed = False
 
     @property
     def get_routers(self):
@@ -50,7 +50,7 @@ class AuthPermissionModel(SoftDeleteObject, BaseModel):
         db_table = 'users_permission_table'
         verbose_name = '权限菜单表'
         verbose_name_plural = verbose_name
-        managed = False
+        # managed = False
 
 
 class UserModel(SoftDeleteObject, BaseModel):
@@ -81,7 +81,7 @@ class UserModel(SoftDeleteObject, BaseModel):
         db_table = 'users_info_table'
         verbose_name = '用户表'
         verbose_name_plural = verbose_name
-        managed = False
+        # managed = False
 
 
 class ShippingAddressModel(SoftDeleteObject, BaseModel):
