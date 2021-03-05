@@ -69,23 +69,27 @@ class ProductView(generics.GenericAPIView):
 
     @staticmethod
     def get_recommend_data(key, page, page_size):
-        qset_product = ProductModel.objects.filter(
-            Q(name__icontains=key) |
-            Q(introduction__icontains=key) |
-            Q(publisher__icontains=key)
+        qset_product = SellingProductModel.objects.select_related('product', 'seller').filter(
+            Q(product__name__icontains=key) |
+            Q(product__introduction__icontains=key) |
+            Q(product__publisher__icontains=key)
         )
         res = []
         products = Pagination.pagination_filter(qset_product, page, page_size)
         for p in products:
             res.append({
                 'id': p.id,
-                'name': p.name,
-                'introduction': p.introduction,
-                'detail': p.detail,
-                'cover': p.cover,
-                'price': str(p.price),
-                'publisher': p.publisher,
-                'category': [c.category_list for c in p.category.all()],
+                'pid': p.product.id,
+                'seller_id': p.seller.id,
+                'count': p.count,
+                'selling_price': str(p.selling_price),
+                'name': p.product.name,
+                'introduction': p.product.introduction,
+                'detail': p.product.detail,
+                'cover': p.product.cover,
+                'price': str(p.product.price),
+                'publisher': p.product.publisher,
+                'category': [c.category_list for c in p.product.category.all()],
             })
 
         return res
@@ -94,7 +98,7 @@ class ProductView(generics.GenericAPIView):
     def get_new_data(key, page, page_size):
         now_time = datetime.datetime.now()
         month_ago = now_time - datetime.timedelta(days=30)
-        qset_product = ProductModel.objects.order_by('-create_time').filter(
+        qset_product = SellingProductModel.objects.select_related('product', 'seller').order_by("-create_time").filter(
             # Q(name__icontains=key) |
             # Q(introduction__icontains=key) |
             # Q(publisher__icontains=key),
@@ -105,13 +109,17 @@ class ProductView(generics.GenericAPIView):
         for p in products:
             res.append({
                 'id': p.id,
-                'name': p.name,
-                'introduction': p.introduction,
-                'detail': p.detail,
-                'cover': p.cover,
-                'price': str(p.price),
-                'publisher': p.publisher,
-                'category': [c.category_list for c in p.category.all()],
+                'pid': p.product.id,
+                'seller_id': p.seller.id,
+                'count': p.count,
+                'selling_price': str(p.selling_price),
+                'name': p.product.name,
+                'introduction': p.product.introduction,
+                'detail': p.product.detail,
+                'cover': p.product.cover,
+                'price': str(p.product.price),
+                'publisher': p.product.publisher,
+                'category': [c.category_list for c in p.product.category.all()],
             })
 
         return res
@@ -171,12 +179,17 @@ class CartView(generics.GenericAPIView):
         user = request_data['_data']['user']
         selling_product_id = request_data.get('selling_product_id')
         seller_id = request_data.get('seller_id')
-        CartModel.objects.create(
-            count=request_data.get('count'),
-            selling_product=SellingProductModel.objects.get(id=selling_product_id),
-            seller=UserModel.objects.get(id=seller_id),
-            buyer=UserModel.objects.get(id=user.id),
-        )
+        obj_cart = CartModel.objects.filter(selling_product_id=selling_product_id, buyer_id=user.id).first()
+        if obj_cart:
+            obj_cart.count += 1
+            obj_cart.save()
+        else:
+            CartModel.objects.create(
+                count=1,
+                selling_product=SellingProductModel.objects.get(id=selling_product_id),
+                seller=UserModel.objects.get(id=seller_id),
+                buyer=UserModel.objects.get(id=user.id),
+            )
 
     @warm_hug()
     def put(self, request, *args, **kwargs):
@@ -266,3 +279,32 @@ class SellingProductView(generics.GenericAPIView):
         return
 
 
+class RateView(generics.GenericAPIView):
+
+    authentication_classes = (JWTAuthentication,)
+
+    @protect()
+    def get(self, request, *args, **kwargs):
+        uid = int(request.GET.get('uid'))
+        pid = int(request.GET.get('pid'))
+        obj_rate = RateModel.objects.filter(user_id=uid, product_id=pid).first()
+        if not obj_rate:
+            return
+        return [{
+            'id': obj_rate.id,
+            'fraction': obj_rate.fraction,
+        }]
+
+    @warm_hug()
+    def post(self, request, *args, **kwargs):
+        request_data = kwargs.get('data')
+        uid = request_data.get('uid')
+        pid = request_data.get('pid')
+        fraction = request_data.get('fraction')
+        RateModel.objects.update_or_create(
+            user_id=uid,
+            product_id=pid,
+            defaults={
+                'fraction': fraction
+            }
+        )
