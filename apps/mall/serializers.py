@@ -46,7 +46,7 @@ class getCartViewSerializer(serializers.Serializer):
 
 
 class postCartViewSerializer(serializers.Serializer):
-    count = serializers.IntegerField()
+    # count = serializers.IntegerField()
     selling_product_id = serializers.IntegerField()
     seller_id = serializers.IntegerField()
     _data = serializers.JSONField(required=False)
@@ -94,6 +94,19 @@ class putSellingProductViewSerializer(serializers.Serializer):
     category_list = serializers.JSONField(required=False)
     img_list = serializers.JSONField(required=False)
     count = serializers.IntegerField(required=False)
+    _data = serializers.JSONField(required=False)
+
+    def validate(self, attrs):
+        now_user = self.context['request'].user
+        attrs['_data'] = {}
+        attrs['_data']['user'] = now_user
+        return attrs
+
+
+class postRateViewSerializer(serializers.Serializer):
+    uid = serializers.IntegerField()
+    pid = serializers.IntegerField()
+    fraction = serializers.IntegerField()
     _data = serializers.JSONField(required=False)
 
     def validate(self, attrs):
