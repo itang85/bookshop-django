@@ -6,3 +6,5 @@ logs/
 media/
 static/
 
+main/settings.py
+
