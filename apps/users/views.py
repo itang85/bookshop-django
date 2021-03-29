@@ -142,6 +142,25 @@ class ShippingAddressView(generics.GenericAPIView):
         ShippingAddressModel.objects.delete(id=request_data.get('id'))
 
 
+class ChooseAddressView(generics.GenericAPIView):
+
+    @warm_hug()
+    def post(self, request, *args, **kwargs):
+        request_data = kwargs.get('data')
+        id = request_data.get('id')
+        obj_addr = ShippingAddressModel.objects.filter(id=id).first()
+        ShippingAddressModel.objects.filter(receiver_id=obj_addr.receiver.id).update(current=False)
+        obj_addr.current = True
+        obj_addr.save()
+
+
+# class UserOrderView(generics.GenericAPIView):
+#
+#     @protect()
+#     def get(self, request, *args, **kwargs):
+#         uid = request.GET.get('uid')
+#
+
 class UserViewSet(ModelViewSet):
     """
     修改局部数据

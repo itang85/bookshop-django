@@ -94,6 +94,7 @@ class ShippingAddressModel(SoftDeleteObject, BaseModel):
     county = models.CharField(max_length=255, default='', blank=True, verbose_name='区')
     addressDetail = models.CharField(max_length=255, default='', blank=True, verbose_name='详细地址')
     isDefault = models.BooleanField(default=False, blank=True, null=True, verbose_name='默认')
+    current = models.BooleanField(default=False, blank=True, null=True, verbose_name='被使用')
     postalCode = models.CharField(max_length=20, default='', blank=True, verbose_name='邮编')
     receiver = models.ForeignKey(
         UserModel,

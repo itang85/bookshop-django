@@ -95,6 +95,8 @@ class VisitThrottle(BaseThrottle):
 
 
 def get_region_cn(code):
+    if not code:
+        return ''
     province = area_dict['province_list'][code[0:2] + '0000']
     city = area_dict['city_list'][code[0:4] + '00']
     county = area_dict['county_list'][code]

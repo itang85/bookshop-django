@@ -308,3 +308,96 @@ class RateView(generics.GenericAPIView):
                 'fraction': fraction
             }
         )
+
+
+class OrderView(generics.GenericAPIView):
+
+    authentication_classes = (JWTAuthentication,)
+
+    @protect()
+    def get(self, request, *args, **kwargs):
+        uid = int(request.GET.get('uid'))
+        status = int(request.GET.get('status'))
+        order_status = [1,2,3,4,5] if status == 0 else [status]
+        obj_order = OrderModel.objects\
+            .select_related('selling_product__product', 'seller', 'buyer', 'address')\
+            .filter(order_status__in=order_status).filter(Q(buyer_id=uid) | Q(seller_id=uid))
+        return [{
+            'order_id': o.order_id,
+            'order_status': o.order_status,
+            'count': o.count,
+            'total_fee': o.total_fee,
+            'product': {
+                'id': o.selling_product.product.id,
+                'name': o.selling_product.product.name,
+                'introduction': o.selling_product.product.introduction,
+                'detail': o.selling_product.product.detail,
+                'cover': o.selling_product.product.cover,
+                'price': str(o.selling_product.product.price),
+                'publisher': o.selling_product.product.publisher,
+                'category_list': [c.category_list for c in o.selling_product.product.category.all()],
+            },
+            'seller': {
+                'id': o.seller.id,
+                'mobile': o.seller.mobile,
+                'email': o.seller.email,
+                'nick_name': o.seller.nick_name,
+                'region': o.seller.region,
+                'avatar_url': o.seller.avatar_url,
+                'gender': o.seller.gender,
+            },
+            'buyer': {
+                'id': o.buyer.id,
+                'mobile': o.buyer.mobile,
+                'email': o.buyer.email,
+                'nick_name': o.buyer.nick_name,
+                'region': o.buyer.region,
+                'avatar_url': o.buyer.avatar_url,
+                'gender': o.buyer.gender,
+            },
+            'address': {
+                'name': o.address.name,
+                'tel': o.address.tel,
+                'areaCode': o.address.areaCode,
+                'country': o.address.country,
+                'province': o.address.province,
+                'city': o.address.city,
+                'county': o.address.county,
+                'addressDetail': o.address.addressDetail,
+                'isDefault': o.address.isDefault,
+                'postalCode': o.address.postalCode,
+            }
+        } for o in obj_order]
+
+    @warm_hug()
+    def post(self, request, *args, **kwargs):
+        request_data = kwargs.get('data')
+        order_id = request_data.get('order_id')
+        sid = request_data.get('sid')
+        seller_id = request_data.get('seller_id')
+        order_status = request_data.get('order_status')
+        count = request_data.get('count')
+        total_fee = request_data.get('total_fee')
+        buyer_id = request_data.get('buyer_id')
+        address_id = request_data.get('address_id')
+        if not address_id and address_id != 0:
+            address = ShippingAddressModel.objects.get(receiver=buyer_id, current=True)
+        else:
+            address = ShippingAddressModel.objects.get(id=address_id)
+        if not order_id:
+            OrderModel.objects.create(
+                order_status=order_status,
+                count=count,
+                total_fee=total_fee,
+                selling_product=SellingProductModel.objects.get(id=sid),
+                seller=UserModel.objects.get(id=seller_id),
+                buyer=UserModel.objects.get(id=buyer_id),
+                address=address,
+            )
+        else:
+            request_data.pop('order_id')
+            obj_order = OrderModel.objects.filter(order_id=order_id).first()
+            for key in request_data:
+                if request_data.get(key) or request_data.get(key) == 0:
+                    setattr(obj_order, key, request_data[key])
+            obj_order.save()

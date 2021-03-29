@@ -424,6 +424,11 @@ class BaseModel(models.Model):
 class FileModel(SoftDeleteObject, BaseModel):
     file = models.FileField(upload_to='file', storage=GoodFileStorage(), verbose_name='文件')
 
+    class Meta:
+        db_table = 'base_file'
+        verbose_name = '文件存储'
+        verbose_name_plural = verbose_name
+
     @property
     def file_path(self):
-        return 'http://192.168.31.130:8000' + self.file.url
+        return 'http://127.0.0.1:8000' + self.file.url

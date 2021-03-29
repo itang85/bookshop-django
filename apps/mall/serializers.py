@@ -114,3 +114,14 @@ class postRateViewSerializer(serializers.Serializer):
         attrs['_data'] = {}
         attrs['_data']['user'] = now_user
         return attrs
+
+
+class postOrderViewSerializer(serializers.Serializer):
+    order_id = serializers.CharField(allow_blank=True, required=False)
+    sid = serializers.IntegerField(required=False)
+    seller_id = serializers.IntegerField(required=False)
+    order_status = serializers.IntegerField(required=False)
+    count = serializers.IntegerField(required=False)
+    total_fee = serializers.DecimalField(max_digits=30, decimal_places=2, required=False)
+    buyer_id = serializers.IntegerField(required=False)
+    address_id = serializers.IntegerField(required=False)

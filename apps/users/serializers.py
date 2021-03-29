@@ -114,7 +114,8 @@ class putShippingAddressViewSerializer(serializers.Serializer):
 class deleteShippingAddressViewSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
-
+class postChooseAddressViewSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
 
 # 新增后台用户使用
 class AddUserSerializer(serializers.ModelSerializer):

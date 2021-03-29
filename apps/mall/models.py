@@ -82,10 +82,11 @@ class ProductImageModel(SoftDeleteObject, BaseModel):
 
 class OrderModel(SoftDeleteObject, BaseModel):
     ORDER_STATUS_CHOICE = (
-        (0, '已关闭'),
-        (1, '已下单'),
+        (1, '待付款'),
         (2, '待发货'),
-        (3, '已完成'),
+        (3, '已发货'),
+        (4, '已完成'),
+        (5, '已关闭'),
     )
     order_id = models.UUIDField(auto_created=True, default=uuid.uuid4, editable=False, verbose_name='订单号')
     order_status = models.IntegerField(choices=ORDER_STATUS_CHOICE, default=1, verbose_name='订单状态')
